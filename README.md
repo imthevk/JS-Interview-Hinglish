@@ -1,6 +1,21 @@
+## Table of Contents
+
+| No. | Questions                                                                                   |
+| --- | ------------------------------------------------------------------------------------------- |
+| 1   | [Event delegation](#1-event-delegation--इवेंट-डेलिगेशन-क्या-है)                             |
+| 2   | [Null and Undefined](#2-null-and-undefined)                                                 |
+| 3   | [What is Garbage Collection?](#3-what-is-garbage-collection-गार्बेज-कलेक्शन-क्या-है)        |
+| 4   | [What is Hoisting?](#4-what-is-hoisting)                                                    |
+| 5   | [Event Propagation](#5-event-propagation)                                                   |
+| 6   | [The Importance of true in addEventListener](#6-the-importance-of-true-in-addeventlistener) |
+| 7   | [What is Scoping? (स्कोपिंग क्या है?)](#7-what-is-scoping-स्कोपिंग-क्या-है)                 |
+| 8   | [What are Closures? (क्लोजर्स क्या हैं?)](#8-what-are-closures-क्लोजर्स-क्या-हैं)           |
+| 9   | [NaN](#9-nan)                                                                               |
+| 10  | [Value vs. Reference](#10-value-vs-reference)                                               |
+
 # Javascript Questions for Interviews
 
-## 1. `Event delegation / इवेंट डेलिगेशन क्या है?`
+## 1. Event delegation / इवेंट डेलिगेशन क्या है?
 
 `Event delegation` is a technique in web development where instead of attaching an event listener to each individual element, you attach a single event listener to a common ancestor. This way, you can handle events for multiple elements efficiently. Event delegation is particularly useful when dealing with dynamically generated content or a large number of elements.
 
@@ -58,7 +73,9 @@ myButtonList.addEventListener("click", (event) => {
 - इवेंट बबलिंग: अधिकतर इवेंट्स DOM में ऊपर की ओर "बबल" होते हैं। यानी किसी चाइल्ड आइटम का इवेंट उसके सब पैरेंट्स पर भी ट्रिगर होगा।
 - event.target: यह प्रॉपर्टी बताती है कि असल में इवेंट किस एलिमेंट ने पैदा किया था।
 
-## 2. `Null and Undefined`
+**[⬆ Back to Top](#table-of-contents)**
+
+## 2. Null and Undefined
 
 `Null` represents an intentional absence of value. It's an assignment value indicating that a variable does not point to any object.
 
@@ -112,7 +129,9 @@ console.log(area); // Output: undefined
 
 - It's generally better to avoid relying on undefined. Try to explicitly initialize your variables whenever possible.
 
-## 3. `What is Garbage Collection? (गार्बेज कलेक्शन क्या है?)`
+**[⬆ Back to Top](#table-of-contents)**
+
+## 3. What is Garbage Collection? (गार्बेज कलेक्शन क्या है?)
 
 `Simplified Analogy`: Imagine your computer's memory as a room. When you create variables and objects, it's like putting items and furniture in that room. Over time, when you're done with items and remove them from the room, some space becomes empty. Garbage collection is like an automatic cleaning service that periodically comes in, sees the empty spaces left by those gone items, and makes that space available for reuse.
 
@@ -146,7 +165,9 @@ alice = null; // Remove the reference
 gc(); // Hypothetical garbage collection cleans up
 ```
 
-## 4. `What is Hoisting?`
+**[⬆ Back to Top](#table-of-contents)**
+
+## 4. What is Hoisting?
 
 `Hoisting` is a behavior in JavaScript where declarations of variables and functions are conceptually "moved" to the top of their scope before the code is executed. It's important to understand that it's not literal movement of the code; it's an explanation of how JavaScript's interpreter seems to work regarding declarations.
 
@@ -196,7 +217,9 @@ function sayHello() {
 
 - Preference for let and const: These have more predictable behavior due to not being accessible before initialization.
 
-## 5. `Event Propagation`
+**[⬆ Back to Top](#table-of-contents)**
+
+## 5. Event Propagation
 
 When an event occurs on an element in the HTML DOM, it doesn't just trigger on that single element. The event "travels" through the DOM tree in two phases:
 
@@ -258,7 +281,9 @@ document.getElementById("grandparent").addEventListener("click", (event) => {
 
 2. `stopPropagation()`: This method called within an event handler stops the event from propagating further.
 
-## 6. `The Importance of true in addEventListener`
+**[⬆ Back to Top](#table-of-contents)**
+
+## 6. The Importance of true in addEventListener
 
 When you use the addEventListener function to attach an event listener to an element, the third argument (which is optional) controls whether you want to use the "capturing" or "bubbling" phase of event propagation.
 
@@ -279,7 +304,9 @@ element.addEventListener(eventName, eventHandlerFunction, useCapture);
 `Default is false`: If you omit the useCapture argument, it defaults to false, which means the event listener will use the bubbling phase.
 `Most Cases Use Bubbling`: Typically, you'll handle events at the target element itself or during the bubbling phase, so the useCapture argument is often omitted.
 
-## 7. `What is Scoping? (स्कोपिंग क्या है?)`
+**[⬆ Back to Top](#table-of-contents)**
+
+## 7. What is Scoping? (स्कोपिंग क्या है?)
 
 `Scoping` defines the visibility and accessibility of variables and functions within different parts of your code. Put simply, it's a set of rules determining where your variables and functions can be "seen" and used.
 
@@ -318,7 +345,9 @@ console.log(globalVariable);
 `Inner Scopes`: Code blocks within inner scopes can access variables from their outer scopes.
 `Avoid global scope pollution`: Use function and block scopes to limit global variables and prevent potential naming conflicts.
 
-## 8. `What are Closures? (क्लोजर्स क्या हैं?)`
+**[⬆ Back to Top](#table-of-contents)**
+
+## 8. What are Closures? (क्लोजर्स क्या हैं?)
 
 A `closure` in JavaScript is the ability of an inner function to retain access to the variables in its outer (enclosing) function's scope even after the outer function has finished executing. In essence, a `closure` 'remembers' its birthplace with all its variables available at the time.
 
@@ -376,6 +405,8 @@ console.log(user2.getScore()); // Output: 0
 - `State Preservation`: For creating functions that maintain 'state' between calls (like counters).
 - `Module Pattern`: Closures were commonly used to create module-like structures in JavaScript before official modules existed in the language.
 
+**[⬆ Back to Top](#table-of-contents)**
+
 ## 9. NaN
 
 `NaN` in JavaScript stands for "Not a Number". It's a special value that represents the result of an invalid or undefined mathematical operation.
@@ -400,6 +431,8 @@ console.log(isNaN(result)); // Output: true
 
 1. `NaN is 'sticky'`: Any operation with NaN usually results in NaN.
 2. `NaN !== NaN`: Surprisingly, NaN is not equal to itself. For comparison, always use the isNaN() function.
+
+**[⬆ Back to Top](#table-of-contents)**
 
 ## 10. Value vs. Reference
 
@@ -442,3 +475,5 @@ person2.name = "Bob";
 console.log(person1.name); // Output: "Bob" (both changed)
 console.log(person2.name); // Output: "Bob"
 ```
+
+**[⬆ Back to Top](#table-of-contents)**
