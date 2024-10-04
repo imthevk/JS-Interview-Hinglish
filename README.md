@@ -12,6 +12,12 @@
 | 8   | [What are Closures? (क्लोजर्स क्या हैं?)](#8-what-are-closures-क्लोजर्स-क्या-हैं)           |
 | 9   | [NaN](#9-nan)                                                                               |
 | 10  | [Value vs. Reference](#10-value-vs-reference)                                               |
+| 11  | [new and this keyword](#11-new-and-this-keyword)                                            |
+| 12  | [call, apply and bind](#12-call-apply-and-bind)                                             |
+| 13  | [var, let and const](#13-var-let-and-const)                                                 |
+| 14  | [Temporal Dead Zone (TDZ)](#14-temporal-dead-zone-tdz)                                      |
+| 15  | [Callback Function](#15-callback-function)                                                  |
+| 16  | [Promises](#16-promises)                                                                    |
 
 # Javascript Questions for Interviews
 
@@ -475,5 +481,396 @@ person2.name = "Bob";
 console.log(person1.name); // Output: "Bob" (both changed)
 console.log(person2.name); // Output: "Bob"
 ```
+
+**[⬆ Back to Top](#table-of-contents)**
+
+## 11. new and this keyword
+
+#### The 'new' Keyword
+
+- `Purpose (उद्देश्य)`: The new keyword is used in JavaScript to create new objects based on a constructor function.
+
+- `Hindi Explanation (हिंदी व्याख्या)`: JavaScript में new कीवर्ड का उपयोग एक कंस्ट्रक्टर फ़ंक्शन के आधार पर नई वस्तुओं (objects) को बनाने के लिए किया जाता है।
+
+```js
+function Car(brand, model) {
+  this.brand = brand;
+  this.model = model;
+}
+let myCar = new Car("Honda", "Civic");
+console.log(myCar.brand); // Output: "Honda"
+```
+
+#### The 'this' Keyword
+
+- `Meaning (अर्थ)`: The this keyword in JavaScript refers to the object that the current function is a part of. The value of this changes depending on the context in which the function is called.
+
+- `Hindi Explanation (हिंदी व्याख्या)`: JavaScript में this कीवर्ड उस वस्तु (object) को इंगित करता है जिसका वर्तमान फ़ंक्शन एक हिस्सा है। जिस संदर्भ में फ़ंक्शन को बुलाया जाता है, उसके आधार पर this का मान बदल जाता है।
+
+```js
+const myObject = {
+  name: "My Object",
+  greet: function () {
+    console.log("Hello from " + this.name);
+  },
+};
+myObject.greet(); // Output: "Hello from My Object"
+
+function myFunction() {
+  console.log(this); // In a browser, this will likely log the 'window' object
+}
+
+myFunction();
+
+document.getElementById("myButton").addEventListener("click", function () {
+  console.log(this); // This will refer to the button element
+});
+```
+
+`Other contexts`: The behavior of this can sometimes be less obvious in cases like standalone functions, event handlers, etc.
+
+#### Arrow Functions (=>) and this
+
+`Arrow functions` have a special behavior regarding this. They do not create their own this binding; instead, they inherit this from the enclosing (surrounding) scope.
+
+```js
+const myObject = {
+  name: "iphone 15",
+  traditionalMethod: function () {
+    console.log(this.name); // Output: "iphone 15"
+  },
+  arrowMethod: () => {
+    console.log(this.name); // Output: Likely undefined or value from outside scope
+  },
+};
+
+myObject.traditionalMethod();
+myObject.arrowMethod();
+```
+
+#### Nested Functions and this
+
+Within `nested functions`, this in the inner function usually refers to the global object (or undefined in strict mode), not the object of the outer function.
+
+```js
+function outerFunction() {
+  this.name = "Outer";
+
+  function innerFunction() {
+    console.log(this.name); // Likely undefined or global object
+  }
+
+  innerFunction();
+}
+
+outerFunction();
+```
+
+**[⬆ Back to Top](#table-of-contents)**
+
+## 12. call, apply and bind
+
+1. **call()**
+
+   - `Purpose`: Invokes a function immediately, allowing you to explicitly set what this refers to inside the function.
+
+   - `Syntax`: functionName.call(thisArg, arg1, arg2, ...)
+     <br/>
+     `उद्देश्य`: यह किसी भी फंक्शन को तुरंत चलाने की सुविधा देता है। इसमें ये भी निर्धारित किया जा सकता है कि फंक्शन के भीतर this क्या दर्शाएगा।
+     `सिंटैक्स`: functionName.call(thisArg, arg1, arg2, ...)
+
+```js
+const person = {
+  fullName: function () {
+    return this.firstName + " " + this.lastName;
+  },
+};
+
+const person1 = { firstName: "Alice", lastName: "Sharma" };
+const person2 = { firstName: "Bob", lastName: "Verma" };
+
+person.fullName.call(person1); // Output: "Alice Sharma"
+person.fullName.call(person2); // Output: "Bob Verma"
+```
+
+2. **apply()**
+
+   - `Purpose`: Very similar to call(), but the way you pass arguments differs. It takes an array of arguments.
+
+   - `Syntax`: functionName.apply(thisArg, [arg1, arg2, ...])
+     <br/>
+     `उद्देश्य`: काफी हद तक call() के समान लेकिन इसमें arguments (तर्क) अलग रूप में पास (pass) की जाती हैं। यह arguments की एक array को ही ले लेती है।
+     `सिंटैक्स`: functionName.apply(thisArg, [arg1, arg2, ...])
+
+```js
+const person = {
+  fullName: function (city, country) {
+    return this.firstName + " " + this.lastName + ", " + city + ", " + country;
+  },
+};
+
+const person1 = { firstName: "Alice", lastName: "Sharma" };
+
+person.fullName.apply(person1, ["Delhi", "India"]);
+// Output: "Alice Sharma, Delhi, India"
+```
+
+`Key difference between call() and apply()`: In call(), arguments are passed individually, whereas in apply(), they are passed as an array.
+
+2. **bind()**
+
+   - `Purpose`: Unlike call() and apply(), which execute the function immediately, bind() creates a new function with a specified this value and arguments, which can be invoked later.
+   - `Syntax`: functionName.bind(thisArg, arg1, arg2, ...)
+     <br/>
+     `उद्देश्य`: यह call() और apply() से भिन्न है क्योंकि यह फंक्शन को तुरंत नहीं चलाता बल्कि एक नया फंक्शन बनाता है, जिसमें this और अन्य तर्कों को बाँध (bind) दिया जाता है, जिसे बाद में कभी भी चलाया जा सकता है।
+     `सिंटैक्स`: functionName.bind(thisArg, arg1, arg2, ...)
+
+```js
+const person = {
+  fullName: function () {
+    return this.firstName + " " + this.lastName;
+  },
+};
+
+const person1 = { firstName: "Alice", lastName: "Sharma" };
+
+const getPerson1Name = person.fullName.bind(person1);
+
+console.log(getPerson1Name()); // Output: "Alice Sharma"
+```
+
+`Usage of bind()`: It’s helpful when you need to pass a function as a callback with a specific this value, without immediately invoking it.
+
+**[⬆ Back to Top](#table-of-contents)**
+
+## 13. var, let, and const
+
+1. **var**
+
+   - `Scope`: var is function-scoped, meaning it is accessible within the function where it's declared, or globally if declared outside any function.
+   - `Hoisting`: Variables declared with var are hoisted to the top of their scope, but their initialization is not. This means you can access the variable before its declaration, but it will be undefined until the line where it’s initialized.
+   - `Re-declaration`: You can redeclare the same variable multiple times in the same scope.
+     <br/>
+     `Scope`: var का स्कोप फंक्शन-स्कोप्ड होता है, यानी यह उसी फंक्शन में उपलब्ध होता है जहाँ इसे घोषित किया गया है, या अगर फंक्शन के बाहर है तो ग्लोबल स्कोप में भी उपलब्ध होता है।
+     `Hoisting`: var डिक्लेरेशन होस्ट होती है, यानी इसे डिक्लेयर करने से पहले एक्सेस किया जा सकता है, लेकिन इनिशलाइज़ नहीं किया जाएगा। इसे इनिशलाइज़ होने तक undefined माना जाएगा।
+     `Re-declaration`: एक ही स्कोप में आप एक ही नाम से वैरिएबल को कई बार डिक्लेयर कर सकते हैं।
+
+```js
+## Syntax
+var x = 10;
+```
+
+`Example:`
+
+```js
+function example() {
+  var x = 5;
+  if (true) {
+    var x = 10; // Same variable as above
+  }
+  console.log(x); // Output: 10 (no block-level scope) }
+}
+```
+
+2. **let**
+
+   - `Scope`: let is block-scoped, meaning it is only accessible within the block (i.e., {}) where it's declared.
+   - `Hoisting`: let is hoisted but not initialized. Accessing it before declaration results in a ReferenceError.
+   - `Re-declaration`: let cannot be redeclared within the same scope, but can be reassigned.
+     <br/>
+     `Scope`: let का स्कोप ब्लॉक-स्कोप्ड होता है, यानी यह केवल उसी ब्लॉक के भीतर उपलब्ध होता है जहाँ इसे घोषित किया गया है।
+     `Hoisting`: let डिक्लेरेशन होस्ट होती है लेकिन इनिशलाइज़ नहीं होती। इसे डिक्लेयर करने से पहले एक्सेस करने पर ReferenceError आएगा।
+     `Re-declaration`: let को एक ही स्कोप में दोबारा डिक्लेयर नहीं किया जा सकता, लेकिन इसे रीअसाइन किया जा सकता है।
+
+```js
+## Syntax
+let x = 10;
+```
+
+`Example:`
+
+```js
+function example() {
+  let x = 5;
+  if (true) {
+    let x = 10; // अलग वैरिएबल (ब्लॉक स्कोप्ड)
+  }
+  console.log(x); // आउटपुट: 5 (ब्लॉक-लेवल स्कोप का सम्मान किया जाता है)
+}
+```
+
+2. **const**
+
+- `Scope`: Like let, const is also block-scoped.
+- `Hoisting`: const is hoisted but not initialized. Accessing it before declaration results in a ReferenceError.
+- `Re-declaration`: You cannot reassign or redeclare a const variable once it’s initialized. However, if the const holds an object or array, its properties or elements can still be modified.
+  <br/>
+  `Scope`: const भी let की तरह ब्लॉक-स्कोप्ड होता है।
+  `Hoisting`: const डिक्लेरेशन होस्ट होती है लेकिन इनिशलाइज़ नहीं होती। इसे डिक्लेयर करने से पहले एक्सेस करने पर ReferenceError मिलेगा।
+  `Re-declaration`: एक बार const वैरिएबल को इनिशलाइज़ करने के बाद इसे दोबारा असाइन या डिक्लेयर नहीं किया जा सकता। लेकिन अगर यह किसी ऑब्जेक्ट या array को होल्ड कर रहा है, तो उसकी प्रॉपर्टीज या एलिमेंट्स बदले जा सकते हैं।
+
+```js
+## Syntax
+const x = 10;
+```
+
+`Example:`
+
+```js
+const arr = [1, 2, 3];
+arr.push(4); // सही (array को मोडिफाई कर रहे हैं, असाइन नहीं कर रहे)
+arr = [5, 6]; // Error: असाइनमेंट किया गया const वैरिएबल
+```
+
+**[⬆ Back to Top](#table-of-contents)**
+
+## 14. Temporal Dead Zone (TDZ)
+
+- `Concept`: The Temporal Dead Zone refers to the time between when a variable is hoisted and when it is initialized. In the case of let and const, accessing the variable before its declaration in this zone causes a ReferenceError.
+- `Scope`: This applies to variables declared with let and const because they are block-scoped and hoisted but not initialized until their declaration is encountered in the code.
+  <br/>
+  `Concept`: Temporal Dead Zone (TDZ) वह समय होता है जब एक वैरिएबल होस्ट किया जाता है लेकिन इसे इनिशलाइज़ नहीं किया गया होता। let और const के मामले में, डिक्लेरेशन से पहले वैरिएबल को एक्सेस करने पर ReferenceError आता है।
+  `Scope`: यह नियम let और const पर लागू होता है क्योंकि यह दोनों ब्लॉक-स्कोप्ड होते हैं और इन्हें होस्ट तो किया जाता है लेकिन तब तक इनिशलाइज़ नहीं किया जाता जब तक कि कोड में इनकी डिक्लेरेशन लाइन तक नहीं पहुंचती।
+
+  <br/>
+  `Example:`
+
+```js
+console.log(x); // ReferenceError: Cannot access 'x' before initialization
+let x = 5;
+```
+
+_उपरोक्त उदाहरण में, let वैरिएबल x होस्ट तो किया गया है, लेकिन उसे डिक्लेयर करने से पहले एक्सेस करने पर एक त्रुटि (ReferenceError) आती है।_
+
+`Summary:`
+
+- TDZ let और const वैरिएबल्स के लिए होता है, जिसमें होस्टिंग और इनिशलाइज़ेशन के बीच उन्हें एक्सेस नहीं किया जा सकता।
+
+**[⬆ Back to Top](#table-of-contents)**
+
+## 15. Callback Function
+
+- `Definition`: A callback function is a function that is passed as an argument to another function and is executed after some operation has been completed by the receiving function. It allows asynchronous or delayed execution of code, which is a key concept in JavaScript, especially when dealing with operations like fetching data, file handling, or timers.
+- `Usage`: In JavaScript, callback functions are commonly used in event handling, asynchronous tasks (like HTTP requests), and array methods (like .map(), .filter()).
+
+`परिभाषा`: एक callback function वह फंक्शन होता है जिसे किसी अन्य फंक्शन के तर्क (argument) के रूप में पास किया जाता है और तब चलाया जाता है जब वह मुख्य फंक्शन अपना कार्य पूरा कर लेता है। यह खासकर तब उपयोगी होता है जब हम ऐसे कार्य कर रहे होते हैं जिनमें समय लगता है, जैसे कि डेटा फ़ेच करना, फाइल हैंडलिंग, या टाइमर।
+`उपयोग`: JavaScript में callback functions का उपयोग इवेंट हैंडलिंग, asynchronous tasks (जैसे HTTP requests), और array methods (जैसे .map(), .filter()) में किया जाता है।
+
+```js
+function mainFunction(callback) {
+  // कुछ कोड
+  callback(); // Callback function को चलाना
+}
+
+function myCallback() {
+  console.log("Callback function चल गया!");
+}
+
+mainFunction(myCallback);
+```
+
+`उदाहरण` (Asynchronous Callback का प्रयोग setTimeout के साथ):
+
+```js
+function greet(name) {
+  console.log("नमस्ते, " + name);
+}
+
+setTimeout(function () {
+  greet("Alice");
+}, 2000); // 2 सेकंड के बाद चलेगा
+```
+
+**[⬆ Back to Top](#table-of-contents)**
+
+## 16. Promises
+
+- `Definition`: A Promise is an object in JavaScript that represents the eventual completion (or failure) of an asynchronous operation and its resulting value. It allows you to write asynchronous code in a more readable and manageable way compared to traditional callback-based approaches.
+- `States of a Promise`:
+
+  - `Pending`: The initial state, meaning the operation has not completed yet.
+  - `Fulfilled`: The operation was successful, and the promise has a resolved value.
+  - `Rejected`: The operation failed, and the promise is rejected with a reason (error).
+
+<br/>
+
+- `परिभाषा`: JavaScript में Promise एक ऐसा ऑब्जेक्ट है जो किसी asynchronous ऑपरेशन के सफल या असफल होने को दर्शाता है और उसके अंतिम परिणाम (value) को प्राप्त करता है। यह callback-based तरीके की तुलना में asynchronous कोड को पढ़ने और प्रबंधित करने का एक बेहतर तरीका प्रदान करता है।
+- `Promise की अवस्थाएँ`:
+  - `Pending`: प्रारंभिक अवस्था, जहाँ ऑपरेशन अभी पूरा नहीं हुआ है।
+  - `Fulfilled`: ऑपरेशन सफल हुआ और प्रॉमिस ने एक वैल्यू प्रदान की।
+  - `Rejected`: ऑपरेशन असफल रहा और प्रॉमिस ने एक कारण (त्रुटि) के साथ इसे अस्वीकार कर दिया।
+
+```js
+## Syntax
+
+let promise = new Promise(function(resolve, reject) {
+  // async operation
+  if (/* success */) {
+    resolve("Operation Successful");
+  } else {
+    reject("Operation Failed");
+  }
+});
+```
+
+```js
+## Example
+
+let fetchData = new Promise(function(resolve, reject) {
+  let dataAvailable = true;
+
+  if (dataAvailable) {
+    resolve("डेटा सफलतापूर्वक प्राप्त हुआ!");
+  } else {
+    reject("डेटा प्राप्त करने में त्रुटि.");
+  }
+});
+
+fetchData
+  .then(function(result) {
+    console.log(result); // Output: Data fetched successfully!
+  })
+  .catch(function(error) {
+    console.log(error); // If rejected: Error fetching data.
+  });
+```
+
+- `How Promises Work:`
+
+  - `then()`: This method is used to handle the result when the promise is resolved (fulfilled).
+  - `catch()`: This method is used to handle any errors if the promise is rejected.
+  - `finally()` (optional): This method runs after the promise is settled, either resolved or rejected, allowing cleanup operations.
+  - `Chaining Promises`:
+    You can chain multiple .then() calls to handle asynchronous operations in a sequence.
+
+<br/>
+
+- `कैसे काम करता है Promise`:
+  - `then()`: यह method तब चलती है जब प्रॉमिस सफलतापूर्वक (fulfilled) हो जाता है।
+  - `catch()`: यह method तब चलती है जब प्रॉमिस असफल (rejected) हो जाता है।
+  - `finally()` (optional): यह method प्रॉमिस के settle होने के बाद चलती है, चाहे वह resolve हो या reject, जिससे cleanup कार्यों को प्रबंधित किया जा सके।
+  - `Promise Chaining`:
+    आप कई .then() calls को एक साथ जोड़ सकते हैं ताकि asynchronous कार्यों को क्रम से संभाला जा सके।
+
+```js
+## Example
+
+let promise = new Promise(function(resolve, reject) {
+  setTimeout(() => resolve(10), 1000);  // 1 सेकंड बाद resolve होगा
+});
+
+promise
+  .then(function(result) {
+    console.log(result); // आउटपुट: 10
+    return result * 2;   // अगले `then` में 20 पास करेगा
+  })
+  .then(function(result) {
+    console.log(result); // आउटपुट: 20
+  });
+```
+
+- `Key Points:`
+  - Promises asynchronous ऑपरेशंस को अधिक प्रभावी ढंग से प्रबंधित करने में सहायक होते हैं।
+    यह "callback hell" से बचने में मदद करते हैं और सफलता और असफलता के मामलों को संभालने के लिए एक साफ और chainable सिंटैक्स प्रदान करते हैं।
 
 **[⬆ Back to Top](#table-of-contents)**
